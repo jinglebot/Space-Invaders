@@ -95,7 +95,7 @@ class Player(Ship):
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
 
-    def move_laser(self, vel, objs):
+    def move_lasers(self, vel, objs):
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
@@ -140,7 +140,7 @@ def main():
     
     player_vel = 5
     enemy_vel = 1
-    laser_vel = 4
+    laser_vel = 5
 
     player = Player(350,650)
 
@@ -174,6 +174,7 @@ def main():
     
     while run:
         clock.tick(FPS)
+        redraw_window()
 
         if lives <= 0 or player.health <= 0:
             lost = True
@@ -211,13 +212,21 @@ def main():
         for enemy in enemies[:]:
             enemy.move(enemy_vel)
             enemy.move_lasers(laser_vel, player)
+
+            if random.randrange(0, 2 * 60) == 1:
+                enemy.shoot()
+
             if enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
 
-        player.move_lasers(laser_vel, enemies)
+            if collide(enemy, player):
+                player.health -= 10
+                enemies.remove(enemy)
 
-        redraw_window()
+        player.move_lasers(-laser_vel, enemies)
+
+    
 
 
 main()
